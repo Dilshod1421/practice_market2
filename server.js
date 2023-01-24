@@ -194,7 +194,7 @@ const server = http.createServer((req, res) => {
 
 
             if (req.method === 'DELETE') {
-                if (req.url === `markets/${id}`) {
+                if (req.url === `/markets/${id}`) {
                     markets.forEach((market, index) => {
                         if (market.marketId == id) {
                             markets.splice(index, 1);
@@ -204,7 +204,7 @@ const server = http.createServer((req, res) => {
                     return res.end(JSON.stringify(markets));
                 };
 
-                if (req.url === `branches/${id}`) {
+                if (req.url === `/branches/${id}`) {
                     branches.forEach((branch, index) => {
                         if (branch.branchId == id) {
                             branches.splice(index, 1);
@@ -214,7 +214,7 @@ const server = http.createServer((req, res) => {
                     return res.end(JSON.stringify(branches));
                 };
 
-                if (req.url === `workers/${id}`) {
+                if (req.url === `/workers/${id}`) {
                     workers.forEach((worker, index) => {
                         if (worker.id == id) {
                             workers.splice(index, 1);
@@ -224,7 +224,7 @@ const server = http.createServer((req, res) => {
                     return res.end(JSON.stringify(workers));
                 };
 
-                if (req.url === `products/${id}`) {
+                if (req.url === `/products/${id}`) {
                     products.forEach((product, index) => {
                         if (product.id == id) {
                             products.splice(index, 1);
