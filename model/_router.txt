@@ -172,24 +172,19 @@
 
 // POST /products/1
 
-/* 
     {
         "title": "Anor",
         "price": "200000",
         "branchId": 2
     }
-*/
 
 // PUT /products/1
-/* 
     {
         "title": "Anor",
         "price": "200000",
         "branchId": 1
     }
-*/
 
 // DELETE /products/1
-
 
 // github commit eng kamida 15 ta bo'lishi kerak
