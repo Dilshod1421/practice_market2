@@ -1,9 +1,14 @@
-[{
-        "marketId": 1,
-        "name": "Makro"
-    },
-    {
-        "marketId": 2,
-        "name": "Korzinka"
-    }
+[
+  {
+    "marketId": 1,
+    "name": "Makro"
+  },
+  {
+    "marketId": 2,
+    "name": "Korzinka"
+  },
+  {
+    "marketId": 3,
+    "name": "Inbazar"
+  }
 ]

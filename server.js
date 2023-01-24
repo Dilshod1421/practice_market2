@@ -1,6 +1,7 @@
 const http = require('http');
 const jwt = require('jsonwebtoken');
 const { resolve } = require('path');
+const { kill } = require('process');
 const { read_file, write_file } = require('./api/fsRead');
 require('dotenv').config();
 const port = process.env.PORT || 6789;
@@ -96,8 +97,142 @@ const server = http.createServer((req, res) => {
             };
 
 
-            if (req.method === 'POST'){
-                
+            if (req.method === 'POST') {
+                if (req.url === '/markets') {
+                    req.on('data', data => {
+                        markets.push({ marketId: markets[markets.length - 1].marketId + 1, ...JSON.parse(data) });
+                        write_file('markets.json', markets);
+                        return res.end(JSON.stringify(markets));
+                    })
+                };
+
+                if (req.url === '/branches') {
+                    req.on('data', data => {
+                        branches.push({ branchId: branches[branches.length - 1].branchId + 1, ...JSON.parse(data) });
+                        write_file('branches.json', branches);
+                        return res.end(JSON.stringify(branches));
+                    })
+                };
+
+                if (req.url === '/workers') {
+                    req.on('data', data => {
+                        workers.push({ id: workers[workers.length - 1].id + 1, ...JSON.parse(data) });
+                        write_file('workers.json', workers);
+                        return res.end(JSON.stringify(workers));
+                    })
+                };
+
+                if (req.url === '/products') {
+                    req.on('data', data => {
+                        products.push({ id: products[products.length - 1].id + 1, ...JSON.parse(data) });
+                        write_file('products.json', products);
+                        return res.end(JSON.stringify(products));
+                    })
+                };
+            };
+
+
+            if (req.method === 'PUT') {
+                if (req.url === `/markets/${id}`) {
+                    req.on('data', data => {
+                        let info = JSON.parse(data);
+                        markets.forEach(market => {
+                            if (market.marketId == id) {
+                                market.name = info.name || market.name;
+                            };
+                        });
+                        write_file("markets.json", markets);
+                        return res.end(JSON.stringify(markets));
+                    });
+                };
+
+                if (req.url === `/branches/${id}`) {
+                    req.on('data', data => {
+                        let info = JSON.parse(data);
+                        branches.forEach(branch => {
+                            if (branch.branchId == id) {
+                                branch.name = info.name || branch.name;
+                                branch.address = info.name || branch.address,
+                                    branch.marketId = info.marketId || branch.marketId;
+                            }
+                        });
+                        write_file("branches.json", branches);
+                        return res.end(JSON.stringify(branches));
+                    });
+                };
+
+                if (req.url === `/workers/${id}`) {
+                    req.on('data', data => {
+                        let info = JSON.parse(data);
+                        workers.forEach(worker => {
+                            if (worker.id == id) {
+                                worker.name = info.name || worker.name,
+                                    worker.phoneNumber = info.phoneNumber || worker.phoneNumber,
+                                    worker.branchId = info.branchId || worker.branchId;
+                            };
+                        });
+                        write_file("workers.json", workers);
+                        return res.end(JSON.stringify(workers));
+                    });
+                };
+
+                if (req.url === `/products/${id}`) {
+                    req.on('data', data => {
+                        let info = JSON.parse(data);
+                        products.forEach(product => {
+                            if (product.id == id) {
+                                product.name = info.name || product.name,
+                                    product.phoneNumber = info.phoneNumber || product.phoneNumber,
+                                    product.branchId = info.branchId || product.branchId;
+                            };
+                        });
+                        write_file("products.json", products);
+                        return res.end(JSON.stringify(products));
+                    });
+                };
+            };
+
+
+            if (req.method === 'DELETE') {
+                if (req.url === `markets/${id}`) {
+                    markets.forEach((market, index) => {
+                        if (market.marketId == id) {
+                            markets.splice(index, 1);
+                        }
+                    });
+                    write_file("markets.json", markets);
+                    return res.end(JSON.stringify(markets));
+                };
+
+                if (req.url === `branches/${id}`) {
+                    branches.forEach((branch, index) => {
+                        if (branch.branchId == id) {
+                            branches.splice(index, 1);
+                        }
+                    });
+                    write_file("branches.json", branches);
+                    return res.end(JSON.stringify(branches));
+                };
+
+                if (req.url === `workers/${id}`) {
+                    workers.forEach((worker, index) => {
+                        if (worker.id == id) {
+                            workers.splice(index, 1);
+                        }
+                    });
+                    write_file("workers.json", workers);
+                    return res.end(JSON.stringify(workers));
+                };
+
+                if (req.url === `products/${id}`) {
+                    products.forEach((product, index) => {
+                        if (product.id == id) {
+                            products.splice(index, 1);
+                        }
+                    });
+                    write_file("products.json", products);
+                    return res.end(JSON.stringify(products));
+                };
             }
         };
     }
