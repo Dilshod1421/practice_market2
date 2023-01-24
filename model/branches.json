@@ -1,13 +1,14 @@
-[{
+[
+    {
         "branchId": 1,
-        "name": "Makro",
-        "address": "Shayxontohur, Hadra",
+        "name": "Makro Yunusobod",
+        "address": "Yunusuobod, Shahriston metro",
         "marketId": 1
     },
     {
         "branchId": 2,
-        "name": "Korzinka",
-        "address": "Chilonzor, C1",
+        "name": "Korzinka Chilonzor",
+        "address": "Chilonzor, 9-mavze",
         "marketId": 2
     }
 ]
