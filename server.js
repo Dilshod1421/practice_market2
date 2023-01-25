@@ -25,7 +25,7 @@ const server = http.createServer((req, res) => {
                     return res.end(JSON.stringify("Wrong name or password"));
                 };
                 let get_token = jwt.sign({ ...data }, key_jwt, { expiresIn: '10h' });
-                res.end(JSON.stringify(get_token));
+                return res.end(JSON.stringify(get_token));
             });
         };
     };
