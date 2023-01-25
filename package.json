@@ -2,7 +2,6 @@
   "name": "practice2",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "server.js",
   "dependencies": {
     "abbrev": "^1.1.1",
