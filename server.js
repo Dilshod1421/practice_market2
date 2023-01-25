@@ -1,7 +1,5 @@
 const http = require('http');
 const jwt = require('jsonwebtoken');
-const { resolve } = require('path');
-const { kill } = require('process');
 const { read_file, write_file } = require('./api/fsRead');
 require('dotenv').config();
 const port = process.env.PORT || 6789;
