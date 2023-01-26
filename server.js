@@ -1,17 +1,26 @@
 const http = require('http');
 const jwt = require('jsonwebtoken');
+const { get } = require('lodash');
 const { read_file, write_file } = require('./api/fsRead');
 require('dotenv').config();
 const port = process.env.PORT || 6789;
 const key_jwt = process.env.SECRET_KEY
 const options = { "Content-Type": "application/json" };
+let admin = read_file('admin.json');
+let markets = read_file('markets.json');
+let branches = read_file('branches.json');
+let workers = read_file('workers.json');
+let products = read_file('products.json');
+function checkToken(req, res, value) {
+    try {
+        jwt.verify(req.headers.authorization, key_jwt);
+        return res.end(JSON.stringify(value));
+    } catch {
+        return res.end(JSON.stringify("Tokenda muammo!"));
+    }
+};
 
 const server = http.createServer((req, res) => {
-    let admin = read_file('admin.json');
-    let markets = read_file('markets.json');
-    let branches = read_file('branches.json');
-    let workers = read_file('workers.json');
-    let products = read_file('products.json');
     let id = req.url.split('/')[2];
     res.writeHead(200, options);
 
@@ -22,30 +31,33 @@ const server = http.createServer((req, res) => {
                 if (admin[0].name != data.name || admin[0].password != data.password) {
                     return res.end(JSON.stringify("Wrong name or password"));
                 };
-                let get_token = jwt.sign({ ...data }, key_jwt, { expiresIn: '2h' });
-                res.end(JSON.stringify(get_token));
+                let get_token = jwt.sign({ name: data.name }, key_jwt, { expiresIn: '2h' });
+                let token = jwt.verify(get_token, key_jwt);
+                if (token.name == admin[0].name) {
+                    res.end(JSON.stringify(get_token));
+                }
             });
         };
     };
 
-    let token = req.headers.authorization;
-    const decode = jwt.verify(token, key_jwt);
-    console.log(decode);
+
     if (req.method === 'GET') {
         if (req.url === '/workers') {
-            return res.end(JSON.stringify(workers));
+            checkToken(req, res, workers);
         };
 
         if (req.url === `/workers/${id}`) {
-            return res.end(JSON.stringify(workers.find(w => w.id == id)));
+            let worker = workers.find(w => w.id == id)
+            checkToken(req, res, worker);
         };
 
         if (req.url === '/products') {
-            return res.end(JSON.stringify(products));
+            checkToken(req, res, products);
         };
 
         if (req.url === `/products/${id}`) {
-            return res.end(JSON.stringify(products.find(p => p.id == id)));
+            let product = products.find(p => p.id == id);
+            checkToken(req, res, product);
         };
 
         markets.forEach((m) => {
@@ -60,7 +72,7 @@ const server = http.createServer((req, res) => {
         });
 
         if (req.url === '/markets') {
-            return res.end(JSON.stringify(markets));
+            checkToken(req, res, markets);
         };
 
         branches.forEach((b) => {
@@ -83,21 +95,24 @@ const server = http.createServer((req, res) => {
         });
 
         if (req.url === `/markets/${id}`) {
-            return res.end(JSON.stringify(markets.find(m => m.marketId == id)));
+            let market = markets.find(m => m.marketId == id);
+            checkToken(req, res, market);
         };
 
         if (req.url === '/branches') {
-            return res.end(JSON.stringify(branches));
+            checkToken(req, res, branches);
         };
 
         if (req.url === `/branches/${id}`) {
-            return res.end(JSON.stringify(branches.find(b => b.branchId == id)));
+            let branch = branches.find(b => b.branchId == id);
+            checkToken(req, res, branch);
         };
     };
 
 
     if (req.method === 'POST') {
         if (req.url === '/markets') {
+            checkToken(req, res);
             req.on('data', data => {
                 markets.push({ marketId: markets[markets.length - 1].marketId + 1, ...JSON.parse(data) });
                 write_file('markets.json', markets);
@@ -106,6 +121,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === '/branches') {
+            checkToken(req, res);
             req.on('data', data => {
                 branches.push({ branchId: branches[branches.length - 1].branchId + 1, ...JSON.parse(data) });
                 write_file('branches.json', branches);
@@ -114,6 +130,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === '/workers') {
+            checkToken(req, res);
             req.on('data', data => {
                 workers.push({ id: workers[workers.length - 1].id + 1, ...JSON.parse(data) });
                 write_file('workers.json', workers);
@@ -122,6 +139,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === '/products') {
+            checkToken(req, res);
             req.on('data', data => {
                 products.push({ id: products[products.length - 1].id + 1, ...JSON.parse(data) });
                 write_file('products.json', products);
@@ -133,6 +151,7 @@ const server = http.createServer((req, res) => {
 
     if (req.method === 'PUT') {
         if (req.url === `/markets/${id}`) {
+            checkToken(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 markets.forEach(market => {
@@ -146,6 +165,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/branches/${id}`) {
+            checkToken(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 branches.forEach(branch => {
@@ -161,6 +181,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/workers/${id}`) {
+            checkToken(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 workers.forEach(worker => {
@@ -176,6 +197,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/products/${id}`) {
+            checkToken(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 products.forEach(product => {
@@ -194,6 +216,7 @@ const server = http.createServer((req, res) => {
 
     if (req.method === 'DELETE') {
         if (req.url === `/markets/${id}`) {
+            checkToken(req, res);
             markets.forEach((market, index) => {
                 if (market.marketId == id) {
                     markets.splice(index, 1);
@@ -204,6 +227,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/branches/${id}`) {
+            checkToken(req, res);
             branches.forEach((branch, index) => {
                 if (branch.branchId == id) {
                     branches.splice(index, 1);
@@ -214,6 +238,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/workers/${id}`) {
+            checkToken(req, res);
             workers.forEach((worker, index) => {
                 if (worker.id == id) {
                     workers.splice(index, 1);
@@ -224,6 +249,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/products/${id}`) {
+            checkToken(req, res);
             products.forEach((product, index) => {
                 if (product.id == id) {
                     products.splice(index, 1);

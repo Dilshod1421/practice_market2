@@ -10,5 +10,9 @@
   {
     "marketId": 3,
     "name": "Inbazar"
+  },
+  {
+    "marketId": 4,
+    "name": "Animals"
   }
 ]
