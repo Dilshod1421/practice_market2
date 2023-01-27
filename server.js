@@ -190,7 +190,7 @@ const server = http.createServer((req, res) => {
                 branches.forEach(branch => {
                     if (branch.branchId == id) {
                         branch.name = info.name || branch.name;
-                        branch.address = info.name || branch.address,
+                        branch.address = info.address || branch.address,
                             branch.marketId = info.marketId || branch.marketId;
                     }
                 });
@@ -221,8 +221,8 @@ const server = http.createServer((req, res) => {
                 let info = JSON.parse(data);
                 products.forEach(product => {
                     if (product.id == id) {
-                        product.name = info.name || product.name,
-                            product.phoneNumber = info.phoneNumber || product.phoneNumber,
+                        product.title = info.title || product.title,
+                            product.price = info.price || product.price,
                             product.branchId = info.branchId || product.branchId;
                     };
                 });

@@ -1,10 +1,86 @@
 [
   {
     "marketId": 1,
-    "name": "Makro"
+    "name": "Makro",
+    "branches": [
+      {
+        "branchId": 1,
+        "name": "Makro Yunusobod",
+        "address": "Yunusuobod, Shahriston metro",
+        "marketId": 1,
+        "workers": [
+          {
+            "id": 1,
+            "name": "Quvondiq",
+            "phoneNumber": "998901234567",
+            "branchId": 1
+          }
+        ],
+        "products": [
+          {
+            "id": 1,
+            "title": "Olma",
+            "price": "100000",
+            "branchId": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "marketId": 2,
-    "name": "Korzinka"
+    "name": "Korzinka",
+    "branches": [
+      {
+        "branchId": 2,
+        "name": "Korzinka Chilonzor",
+        "address": "Chilonzor, 9-mavze",
+        "marketId": 2,
+        "workers": [
+          {
+            "id": 2,
+            "name": "Davlat",
+            "phoneNumber": "998901234568",
+            "branchId": 2
+          }
+        ],
+        "products": [
+          {
+            "id": 2,
+            "title": "Anor",
+            "price": "200000",
+            "branchId": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "marketId": 3,
+    "name": "Inbazar",
+    "branches": [
+      {
+        "branchId": 3,
+        "name": "Inbazar",
+        "address": "Inbazar",
+        "marketId": 3,
+        "workers": [
+          {
+            "id": 3,
+            "name": "Murod",
+            "phoneNumber": "998901234569",
+            "branchId": 3
+          }
+        ],
+        "products": [
+          {
+            "id": 3,
+            "title": "Non",
+            "price": "2800",
+            "branchId": 3
+          }
+        ]
+      }
+    ]
   }
 ]
