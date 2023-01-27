@@ -1,6 +1,6 @@
 const http = require('http');
 const jwt = require('jsonwebtoken');
-const { get } = require('lodash');
+const { remove } = require('lodash');
 const { read_file, write_file } = require('./api/fsRead');
 require('dotenv').config();
 const port = process.env.PORT || 6789;
@@ -14,16 +14,24 @@ let products = read_file('products.json');
 function checkToken(req, res, value) {
     try {
         jwt.verify(req.headers.authorization, key_jwt);
-        return res.end(JSON.stringify(value));
+        res.end(JSON.stringify(value));
     } catch {
         return res.end(JSON.stringify("Tokenda muammo!"));
     }
 };
+function checkPost(req, res) {
+    try {
+        jwt.verify(req.headers.authorization, key_jwt);
+    } catch {
+        return res.end(JSON.stringify("Tokenda muammo!"));
+    }
+}
 
 const server = http.createServer((req, res) => {
     let id = req.url.split('/')[2];
     res.writeHead(200, options);
 
+    //=========================== POST-LOGIN =====================================
     if (req.method === 'POST') {
         if (req.url === '/login') {
             req.on('data', (data) => {
@@ -41,7 +49,63 @@ const server = http.createServer((req, res) => {
     };
 
 
+    //========================= GET =======================================
     if (req.method === 'GET') {
+        branches.forEach((b) => {
+            let addW = [];
+            workers.forEach((w) => {
+                if (w.branchId == b.branchId) {
+                    addW.push(w);
+                }
+            })
+            b.workers = addW;
+            let addP = [];
+            products.forEach((p) => {
+                if (b.branchId == p.branchId) {
+                    addP.push(p);
+                }
+            })
+            b.products = addP;
+        });
+
+        markets.forEach((m) => {
+            let addB = [];
+            branches.forEach((br) => {
+                if (br.marketId == m.marketId) {
+                    if (req.url === '/markets') {
+                        delete br.workers;
+                        delete br.products;
+                    }
+                    addB.push(br);
+                }
+            })
+            m.branches = addB;
+        });
+
+        if (req.url === '/markets') {
+            checkToken(req, res, markets);
+        };
+
+        if (req.url === `/markets/${id}`) {
+            let market;
+            markets.forEach(m => {
+                if (m.marketId == id) {
+                    market = m;
+                    return;
+                }
+            });
+            checkToken(req, res, market);
+        };
+
+        if (req.url === '/branches') {
+            checkToken(req, res, branches);
+        };
+
+        if (req.url === `/branches/${id}`) {
+            let branch = branches.find(b => b.branchId == id);
+            checkToken(req, res, branch);
+        };
+
         if (req.url === '/workers') {
             checkToken(req, res, workers);
         };
@@ -60,77 +124,32 @@ const server = http.createServer((req, res) => {
             checkToken(req, res, product);
         };
 
-        markets.forEach((m) => {
-            let addB = [];
-            branches.forEach((br) => {
-                if (br.marketId == m.marketId) {
-                    delete br.marketId;
-                    addB.push(br);
-                }
-            })
-            m.branches = addB;
-        });
-
-        if (req.url === '/markets') {
-            checkToken(req, res, markets);
-        };
-
-        branches.forEach((b) => {
-            let addW = [];
-            workers.forEach((w) => {
-                if (w.branchId == b.branchId) {
-                    delete w.branchId;
-                    addW.push(w);
-                }
-            })
-            b.workers = addW;
-            let addP = [];
-            products.forEach((p) => {
-                if (b.branchId == p.branchId) {
-                    delete p.branchId;
-                    addP.push(p);
-                }
-            })
-            b.products = addP;
-        });
-
-        if (req.url === `/markets/${id}`) {
-            let market = markets.find(m => m.marketId == id);
-            checkToken(req, res, market);
-        };
-
-        if (req.url === '/branches') {
-            checkToken(req, res, branches);
-        };
-
-        if (req.url === `/branches/${id}`) {
-            let branch = branches.find(b => b.branchId == id);
-            checkToken(req, res, branch);
-        };
     };
 
 
     if (req.method === 'POST') {
         if (req.url === '/markets') {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
-                markets.push({ marketId: markets[markets.length - 1].marketId + 1, ...JSON.parse(data) });
-                write_file('markets.json', markets);
-                return res.end(JSON.stringify(markets));
+                let markets2 = read_file('markets.json');
+                markets2.push({ marketId: markets2[markets2.length - 1].marketId + 1, ...JSON.parse(data) });
+                write_file('markets.json', markets2);
+                return res.end(JSON.stringify(markets2));
             })
         };
 
         if (req.url === '/branches') {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
-                branches.push({ branchId: branches[branches.length - 1].branchId + 1, ...JSON.parse(data) });
-                write_file('branches.json', branches);
-                return res.end(JSON.stringify(branches));
+                let branches2 = read_file('branches.json');
+                branches2.push({ branchId: branches2[branches2.length - 1].branchId + 1, ...JSON.parse(data) });
+                write_file('branches.json', branches2);
+                return res.end(JSON.stringify(branches2));
             })
         };
 
         if (req.url === '/workers') {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
                 workers.push({ id: workers[workers.length - 1].id + 1, ...JSON.parse(data) });
                 write_file('workers.json', workers);
@@ -139,7 +158,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === '/products') {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
                 products.push({ id: products[products.length - 1].id + 1, ...JSON.parse(data) });
                 write_file('products.json', products);
@@ -151,7 +170,7 @@ const server = http.createServer((req, res) => {
 
     if (req.method === 'PUT') {
         if (req.url === `/markets/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 markets.forEach(market => {
@@ -165,7 +184,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/branches/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 branches.forEach(branch => {
@@ -181,7 +200,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/workers/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 workers.forEach(worker => {
@@ -197,7 +216,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/products/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             req.on('data', data => {
                 let info = JSON.parse(data);
                 products.forEach(product => {
@@ -216,7 +235,7 @@ const server = http.createServer((req, res) => {
 
     if (req.method === 'DELETE') {
         if (req.url === `/markets/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             markets.forEach((market, index) => {
                 if (market.marketId == id) {
                     markets.splice(index, 1);
@@ -227,7 +246,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/branches/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             branches.forEach((branch, index) => {
                 if (branch.branchId == id) {
                     branches.splice(index, 1);
@@ -238,7 +257,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/workers/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             workers.forEach((worker, index) => {
                 if (worker.id == id) {
                     workers.splice(index, 1);
@@ -249,7 +268,7 @@ const server = http.createServer((req, res) => {
         };
 
         if (req.url === `/products/${id}`) {
-            checkToken(req, res);
+            checkPost(req, res);
             products.forEach((product, index) => {
                 if (product.id == id) {
                     products.splice(index, 1);

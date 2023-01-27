@@ -1,5 +1,4 @@
-[
-  {
+[{
     "id": 1,
     "name": "Quvondiq",
     "phoneNumber": "998901234567",
@@ -16,5 +15,5 @@
     "name": "Murod",
     "phoneNumber": "998901234569",
     "branchId": 3
-}
+  }
 ]
